@@ -15,6 +15,19 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_actionAbout_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_pushButton_clicked();
+
+    void on_lineEdit_textChanged(const QString &arg1);
+
+    void on_ipaAddressInput_textChanged(const QString &arg1);
+
+    void on_connectButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
