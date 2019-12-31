@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "utils.h"
 
+
 int main() {
-    printHello();
+    getCommands();
 }
