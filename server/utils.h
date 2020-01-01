@@ -8,8 +8,10 @@ struct CommandStruct {
     int code;
     char command[255];
     char commandArgs[255];
-} commands[100];
- 
-void printHello();
+};
 
+void getCommands(struct CommandStruct commands[20]);
+
+void commandsInfoPayload(struct CommandStruct commands[20], char *payload);
+char *composeResponse(char data[]);
 #endif

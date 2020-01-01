@@ -3,23 +3,42 @@
 #include <stdlib.h>
 #include "utils.h"
 
+int commandsNum = 0;
 
-void getCommands () {
+void getCommands (struct CommandStruct *commands) {
+
     FILE *fp = fopen(CONFIG_FILE, "r");
     char buff[2505];
-    int index = 0;
+    
 
     while ( fgets ( buff, sizeof buff, fp ) != NULL ) {
         char *title = strtok(buff, "|");
         char *command = strtok(NULL, "|");
         char *commandArgs = strtok(NULL, "|");
 
-        strcpy(commands[index].title, title);
-        strcpy(commands[index].command, command);
-        strcpy(commands[index].commandArgs, commandArgs);
-
-        printf("%s\n",commands[index].commandArgs);
-        index++;
+        strcpy(commands[commandsNum].title, title);
+        strcpy(commands[commandsNum].command, command);
+        strcpy(commands[commandsNum].commandArgs, commandArgs);
+        commandsNum++;
     }
-    fclose ( fp );
+    fclose (fp);
+}
+
+void commandsInfoPayload(struct CommandStruct *commands, char *payload) {
+    
+    for(int i = 0; i < commandsNum; i++) {
+        strcat(payload, commands[i].title);
+        strcat(payload, "|");
+
+        char code[100];
+        sprintf(code,"%d", i);
+
+        strcat(payload, code);
+        strcat(payload, "\n");
+    }
+}
+
+char *composeResponse(char data[]) {
+    strcat(data, "END");
+    return data;
 }

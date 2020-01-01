@@ -1,0 +1,4 @@
+Increase Brightness| ./modules/brightness | inc
+Decrease Brightness| ./modules/brightness | dec
+Open explorer| ./modules/open | explorer
+Open browser| ./modules/open | browser

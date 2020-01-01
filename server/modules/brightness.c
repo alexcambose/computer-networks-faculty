@@ -25,7 +25,7 @@ void main(int argc, char *argv[]) {
     } else {
         printf("Argument %s not recognized", argv[1]);
     }
-    sprintf(buff,"%d", currentBrightness);
+    sprintf(buff, "%d", currentBrightness);
 
     printf("New brightness is %d\n", currentBrightness);
     FILE *fpr = fopen(BRIGHTNESS_FILE, "w");
