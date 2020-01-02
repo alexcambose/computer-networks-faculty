@@ -1,8 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <string>
+#include <cstring>
 #include <QMainWindow>
-
+#include <QModelIndexList>
+using namespace std;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -24,7 +26,23 @@ private slots:
 
     void on_connectButton_clicked();
 
+    void on_initiateAction_clicked();
+
+    void on_disconnectButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+};
+struct Command {
+    char title[100];
+    int code;
+};
+struct ConnectedClients {
+    Command commands[20];
+    char address[100];
+    int port;
+    int socket;
+    bool isSelected;
+    int commandsNum;
 };
 #endif // MAINWINDOW_H
