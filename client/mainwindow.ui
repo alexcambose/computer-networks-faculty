@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
-    <height>420</height>
+    <width>491</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,9 +19,12 @@
   <property name="windowTitle">
    <string>IOT</string>
   </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -36,6 +39,9 @@
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
      <property name="topMargin">
       <number>0</number>
      </property>
@@ -50,18 +56,24 @@
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLineEdit" name="ipaAddressInput">
+         <property name="text">
+          <string>127.0.0.1</string>
+         </property>
          <property name="placeholderText">
           <string>Ip address</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit">
+        <widget class="QLineEdit" name="portInput">
          <property name="maximumSize">
           <size>
            <width>100</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="text">
+          <string>4444</string>
          </property>
          <property name="placeholderText">
           <string>Port</string>
@@ -71,10 +83,13 @@
        <item>
         <widget class="QPushButton" name="connectButton">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Connect</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -85,10 +100,17 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QListView" name="ipListView"/>
+          <widget class="QListView" name="ipListView">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="disconnectButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Disconnect</string>
            </property>
@@ -99,7 +121,14 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QListView" name="actionsListView"/>
+          <widget class="QListView" name="actionsListView">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="resizeMode">
+            <enum>QListView::Adjust</enum>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="initiateAction">
@@ -123,7 +152,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>487</width>
+     <width>491</width>
      <height>22</height>
     </rect>
    </property>

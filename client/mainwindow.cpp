@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sstream>
+#include <QCloseEvent>
 
 using namespace std;
 ConnectedClients clients[20];
@@ -49,7 +50,6 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_ipaAddressInput_textChanged(const QString &arg1)
 {
-    this->ui->initiateAction->setDisabled(false);
     this->ui->connectButton->setDisabled(false);
 }
 void refreshList(Ui::MainWindow *ui) {
@@ -94,15 +94,18 @@ void MainWindow::on_connectButton_clicked()
 
    // memset(&clientSocket, '\0', sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(4444);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serverAddr.sin_port = htons(atoi(port));
+    serverAddr.sin_addr.s_addr = inet_addr(address);
 
     int ret = ::connect(clientSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
     if(ret < 0){
         printf("[-]Error in connection. %d\n", clientSocket);
-        exit(1);
+        QMessageBox messageBox;
+        messageBox.critical(0,"Error","Cannnot connect to server !");
+        messageBox.setFixedSize(500,200);
+        return;
     }
-    printf("[+]Connected to Server.\n");
+    qDebug() << "Connected to server" << address << ":" << port;
     char buffer[1024];
     bzero (buffer, 1024);
     if(recv(clientSocket, buffer, 1024, 0) < 0){
@@ -118,30 +121,16 @@ void MainWindow::on_connectButton_clicked()
     clients[clientsNum].socket = clientSocket;
     strcpy(clients[clientsNum].address, address);
     clients[clientsNum].port = atoi(port);
+    for(int i = 0; i < clientsNum; i++) {
+        clients[i].isSelected = 0;
+    }
+    clients[clientsNum].isSelected = 1;
 
     clientsNum++;
-    QStringList leftList, rightList;
-    char b[100];
-    for(int i = 0; i < clientsNum; i++) {
-        for(int j = 0; j < clients[i].commandsNum; j++) {
-            rightList << clients[i].commands[j].title;
-        }
-        strcpy(b, clients[i].address);
-        strcat(b, ":");
-        char port[100];
-        sprintf(port,"%d", clients[i].port);
-        strcat(b, port);
-        leftList << b;
-    }
-    QStringListModel *model = new QStringListModel();
-    model->setStringList(leftList);
-    this->ui->ipListView->setModel(model);
-    QStringListModel *model1 = new QStringListModel();
-    model1->setStringList(rightList);
-    this->ui->actionsListView->setModel(model1);
+    MainWindow::updateList();
     // empty inputs
-    this->ui->ipaAddressInput->setText("");
-    this->ui->portInput->setText("");
+    //this->ui->ipaAddressInput->setText("");
+    //this->ui->portInput->setText("");
     this->ui->connectButton->setDisabled(true);
 }
 
@@ -150,23 +139,103 @@ void MainWindow::on_initiateAction_clicked()
 {
     int currentSocketIndex =  this->ui->ipListView->currentIndex().row();
     int currentActionIndex =  this->ui->actionsListView->currentIndex().row();
+    qDebug() << "Trying to execute from " << currentSocketIndex << "" << currentActionIndex;
     if(currentSocketIndex != -1 && currentActionIndex != -1) {
         char payload[100];
         bzero(payload,100);
         sprintf(payload,"%d", clients[currentSocketIndex].commands[currentActionIndex].code);
         strcat(payload, "|END ");
         send( clients[currentSocketIndex].socket, payload, strlen(payload), 0);
-        qDebug() <<  currentSocketIndex << currentActionIndex;
+        qDebug() << "Executing command code" << clients[currentSocketIndex].commands[currentActionIndex].code << "on" <<  clients[currentSocketIndex].address << ":" <<  clients[currentSocketIndex].port << "\n";
     }
 }
 
+void disconnectFromServer(int currentSocketIndex) {
+    send(clients[currentSocketIndex].socket, "DISCONNECT", strlen("DISCONNECT"), 0);
+    ::close(clients[currentSocketIndex].socket);
+    qDebug() << "Disconnected from" << clients[currentSocketIndex].address << clients[currentSocketIndex].port << "\n";
+    // remove from array
+    for (int i = currentSocketIndex; i < clientsNum; ++i)
+        clients[i] = clients[i + 1];
+    clientsNum--;
+}
+void disconnectFromServer() {
+    for (int i = 0; i < clientsNum; ++i)
+        if(clients[i].isSelected) disconnectFromServer(i);
+}
 void MainWindow::on_disconnectButton_clicked()
 {
-    int currentSocketIndex =  this->ui->ipListView->currentIndex().row();
-    if(currentSocketIndex != -1) {
-        char payload[100];
-        strcpy(payload, "DISCONNECT");
-        send( clients[currentSocketIndex].socket, "DISCONNECT", strlen("DISCONNECT"), 0);
-        ::close(clients[currentSocketIndex].socket);
+    disconnectFromServer();
+    MainWindow::updateList();
+}
+
+void MainWindow::updateList() {
+    QStringList leftList, rightList;
+    char b[100];
+    for(int i = 0; i < clientsNum; i++) {
+        if(clients[i].isSelected) {
+            for(int j = 0; j < clients[i].commandsNum; j++) {
+                rightList << clients[i].commands[j].title;
+            }
+        }
+        strcpy(b, clients[i].address);
+        strcat(b, ":");
+        char port[100];
+        sprintf(port,"%d", clients[i].port);
+        strcat(b, port);
+        if(clients[i].isSelected) {
+            strcat(b, "*");
+        }
+        leftList << b;
+    }
+    QStringListModel *model = new QStringListModel();
+    model->setStringList(leftList);
+    this->ui->ipListView->setModel(model);
+    QStringListModel *model1 = new QStringListModel();
+    model1->setStringList(rightList);
+    this->ui->actionsListView->setModel(model1);
+    if(clientsNum > 0) {
+            this->ui->initiateAction->setDisabled(false);
+        this->ui->connectButton->setDisabled(false);
+    } else {
+        this->ui->connectButton->setDisabled(true);
+            this->ui->initiateAction->setDisabled(true);
     }
 }
+
+
+void MainWindow::closeEvent (QCloseEvent *event){
+//        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
+//                                                                    tr("Are you sure?\nThis action will close all the opened connections!"),
+//                                                                    QMessageBox::No | QMessageBox::Yes,
+//                                                                    QMessageBox::No);
+//        if (resBtn != QMessageBox::Yes) {
+//            event->ignore();
+//        } else {
+            event->accept();
+            for(int i = 0; i <= clientsNum; i++) {
+                disconnectFromServer(0);
+            }
+//        }
+}
+
+
+void MainWindow::on_actionsListView_clicked(const QModelIndex &index)
+{
+   this->ui->initiateAction->setEnabled(true);
+}
+
+void MainWindow::on_ipListView_clicked(const QModelIndex &index)
+{
+    this->ui->ipListView->setCurrentIndex(index);
+    int currentSocketIndex =  this->ui->ipListView->currentIndex().row();
+    for(int i = 0; i < clientsNum; i++) {
+        clients[i].isSelected = 0;
+    }
+    clients[currentSocketIndex].isSelected = 1;
+    MainWindow::updateList();
+    qDebug() << "Selected" << clients[currentSocketIndex].address << " " << clients[currentSocketIndex].port;
+    this->ui->disconnectButton->setEnabled(true);
+}
+
+

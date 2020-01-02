@@ -8,9 +8,14 @@
 #include <arpa/inet.h>
 #include "utils.h"
 
-#define PORT 4444
 
-int main(){
+int main(int argc, char *argv[]){
+	if (argc != 2)
+    {
+      printf ("Syntax is: %s <port>\n", argv[0]);
+      return -1;
+    }
+
     char payload[100];
     bzero(payload,100);
     struct CommandStruct commands[20];
@@ -35,10 +40,10 @@ int main(){
 		exit(1);
 	}
 	printf("[+]Server Socket is created.\n");
-
+	int port =  atoi (argv[1]);
 	memset(&serverAddr, '\0', sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(PORT);
+	serverAddr.sin_port = htons (port);
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	ret = bind(sockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr));
@@ -46,7 +51,7 @@ int main(){
 		printf("[-]Error in binding.\n");
 		exit(1);
 	}
-	printf("[+]Bind to port %d\n", 4444);
+	printf("[+]Bind to port %d\n", port);
 
 	if(listen(sockfd, 10) == 0){
 		printf("[+]Listening....\n");
@@ -87,7 +92,7 @@ int main(){
                             strcat(execute, commands[i].commandArgs);
 
                             printf("EXECUTING %s\n", commands[i].title);
-                            //system(execute);
+                            system(execute);
                         }
                     }
 					//send(newSocket, "test", strlen("test"), 0);

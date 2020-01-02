@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    void updateList();
 private slots:
     void on_actionAbout_triggered();
 
@@ -29,6 +29,12 @@ private slots:
     void on_initiateAction_clicked();
 
     void on_disconnectButton_clicked();
+
+    void on_actionsListView_clicked(const QModelIndex &index);
+
+    void closeEvent(QCloseEvent *event);
+
+    void on_ipListView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
