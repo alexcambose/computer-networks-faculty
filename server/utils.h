@@ -10,8 +10,9 @@ struct CommandStruct {
     char commandArgs[255];
 };
 
-void getCommands(struct CommandStruct commands[20]);
+int getCommands(struct CommandStruct commands[20]);
 
 void commandsInfoPayload(struct CommandStruct commands[20], char *payload);
 char *composeResponse(char data[]);
+void executePaylaod(char buffer[]);
 #endif

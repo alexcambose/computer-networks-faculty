@@ -5,7 +5,7 @@
 
 int commandsNum = 0;
 
-void getCommands (struct CommandStruct *commands) {
+int getCommands (struct CommandStruct *commands) {
 
     FILE *fp = fopen(CONFIG_FILE, "r");
     char buff[2505];
@@ -19,9 +19,11 @@ void getCommands (struct CommandStruct *commands) {
         strcpy(commands[commandsNum].title, title);
         strcpy(commands[commandsNum].command, command);
         strcpy(commands[commandsNum].commandArgs, commandArgs);
+        commands[commandsNum].code = commandsNum;
         commandsNum++;
     }
     fclose (fp);
+    return commandsNum;
 }
 
 void commandsInfoPayload(struct CommandStruct *commands, char *payload) {
@@ -41,4 +43,8 @@ void commandsInfoPayload(struct CommandStruct *commands, char *payload) {
 char *composeResponse(char data[]) {
     strcat(data, "END");
     return data;
+}
+
+void executePaylaod(char buffer[]) {
+   
 }
