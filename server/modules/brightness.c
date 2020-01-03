@@ -19,9 +19,9 @@ void main(int argc, char *argv[]) {
     printf("Current brightness is %d\n", currentBrightness);
 
     if(strcmp(argv[1], INCREMENT) == 0) {
-        currentBrightness+=20;
+        currentBrightness+=100;
     } else if (strcmp(argv[1], DECREMENT) == 0) {
-        currentBrightness-=20;
+        currentBrightness-=100;
     } else {
         printf("Argument %s not recognized", argv[1]);
     }

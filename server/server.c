@@ -77,7 +77,7 @@ int main(int argc, char *argv[]){
 				recv(newSocket, buffer, 1024, 0);
 				if(strcmp(buffer, "DISCONNECT") == 0){
 					printf("Disconnected from %s:%d\n", inet_ntoa(newAddr.sin_addr), ntohs(newAddr.sin_port));
-					break;
+					exit(0);
 				}else{
 					//printf("Client: %s\n", buffer);
 					printf("Client: %s\n", buffer);
