@@ -83,6 +83,15 @@ void MainWindow::on_connectButton_clicked()
     char address[200], port[200];
     strcpy(address, this->ui->ipaAddressInput->text().toUtf8().constData());
     strcpy(port, this->ui->portInput->text().toUtf8().constData());
+
+    for(int i = 0; i < clientsNum; i++) {
+        if(strcmp(clients[i].address, address) == 0 && clients[i].port == atoi(port)) {
+            QMessageBox messageBox;
+            messageBox.critical(0,"Error","You are already connected !");
+            messageBox.setFixedSize(500,200);
+            return;
+        }
+    }
     struct sockaddr_in serverAddr;
 
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -137,7 +146,12 @@ void MainWindow::on_connectButton_clicked()
 
 void MainWindow::on_initiateAction_clicked()
 {
-    int currentSocketIndex =  this->ui->ipListView->currentIndex().row();
+    int currentSocketIndex = 0;
+    for (int i = 0; i < clientsNum; ++i) {
+        if(clients[i].isSelected) {
+            currentSocketIndex = i;
+        }
+    }
     int currentActionIndex =  this->ui->actionsListView->currentIndex().row();
     qDebug() << "Trying to execute from " << currentSocketIndex << "" << currentActionIndex;
     if(currentSocketIndex != -1 && currentActionIndex != -1) {
@@ -145,8 +159,9 @@ void MainWindow::on_initiateAction_clicked()
         bzero(payload,100);
         sprintf(payload,"%d", clients[currentSocketIndex].commands[currentActionIndex].code);
         strcat(payload, "|END ");
-        send( clients[currentSocketIndex].socket, payload, strlen(payload), 0);
-        qDebug() << "Executing command code" << clients[currentSocketIndex].commands[currentActionIndex].code << "on" <<  clients[currentSocketIndex].address << ":" <<  clients[currentSocketIndex].port << "\n";
+        int res = send( clients[currentSocketIndex].socket, payload, strlen(payload), 0);
+
+        qDebug() << "Executing command code" << clients[currentSocketIndex].commands[currentActionIndex].code << "on" <<  clients[currentSocketIndex].address << ":" <<  clients[currentSocketIndex].port << "RESULT CODE:" << res << "\n";
     }
 }
 
@@ -195,11 +210,13 @@ void MainWindow::updateList() {
     model1->setStringList(rightList);
     this->ui->actionsListView->setModel(model1);
     if(clientsNum > 0) {
-            this->ui->initiateAction->setDisabled(false);
+        this->ui->initiateAction->setDisabled(false);
         this->ui->connectButton->setDisabled(false);
+        this->ui->disconnectButton->setDisabled(false);
     } else {
         this->ui->connectButton->setDisabled(true);
-            this->ui->initiateAction->setDisabled(true);
+        this->ui->initiateAction->setDisabled(true);
+        this->ui->disconnectButton->setDisabled(true);
     }
 }
 
@@ -235,7 +252,7 @@ void MainWindow::on_ipListView_clicked(const QModelIndex &index)
     clients[currentSocketIndex].isSelected = 1;
     MainWindow::updateList();
     qDebug() << "Selected" << clients[currentSocketIndex].address << " " << clients[currentSocketIndex].port;
-    this->ui->disconnectButton->setEnabled(true);
+
 }
 
 
