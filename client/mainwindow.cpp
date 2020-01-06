@@ -160,7 +160,11 @@ void MainWindow::on_initiateAction_clicked()
         sprintf(payload,"%d", clients[currentSocketIndex].commands[currentActionIndex].code);
         strcat(payload, "|END ");
         int res = send( clients[currentSocketIndex].socket, payload, strlen(payload), 0);
-
+        if(res < 0) {
+            QMessageBox messageBox;
+            messageBox.critical(0,"Error","Cannnot send command to server !");
+            messageBox.setFixedSize(500,200);
+        }
         qDebug() << "Executing command code" << clients[currentSocketIndex].commands[currentActionIndex].code << "on" <<  clients[currentSocketIndex].address << ":" <<  clients[currentSocketIndex].port << "RESULT CODE:" << res << "\n";
     }
 }
