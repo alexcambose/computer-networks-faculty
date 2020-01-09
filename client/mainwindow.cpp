@@ -138,8 +138,8 @@ void MainWindow::on_connectButton_clicked()
     clientsNum++;
     MainWindow::updateList();
     // empty inputs
-    //this->ui->ipaAddressInput->setText("");
-    //this->ui->portInput->setText("");
+    this->ui->ipaAddressInput->setText("");
+    this->ui->portInput->setText("");
     this->ui->connectButton->setDisabled(true);
 }
 

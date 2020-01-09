@@ -57,7 +57,7 @@
        <item>
         <widget class="QLineEdit" name="ipaAddressInput">
          <property name="text">
-          <string>127.0.0.1</string>
+          <string/>
          </property>
          <property name="placeholderText">
           <string>Ip address</string>
@@ -73,7 +73,7 @@
           </size>
          </property>
          <property name="text">
-          <string>4444</string>
+          <string/>
          </property>
          <property name="placeholderText">
           <string>Port</string>
